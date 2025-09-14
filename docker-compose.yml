@@ -1,1 +1,59 @@
+version: '3.8'
 
+services:
+  stride-analyzer:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: stride-analyzer
+    ports:
+      - "8000:8000"
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION:-2024-02-01}
+      - AZURE_OPENAI_DEPLOYMENT_NAME=${AZURE_OPENAI_DEPLOYMENT_NAME:-gpt-4-vision}
+      - APP_ENV=production
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./uploads:/app/uploads:rw
+    networks:
+      - stride-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: stride-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - stride-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  nginx:
+    image: nginx:alpine
+    container_name: stride-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    networks:
+      - stride-network
+    depends_on:
+      - stride-analyzer
+    restart: unless-stopped
+
+networks:
+  stride-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
