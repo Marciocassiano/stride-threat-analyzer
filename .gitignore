@@ -1,14 +1,39 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
+# Project specific
+uploads/
+*.log
+.env
+.env.local
+.env.production
 
-# C extensions
-*.so
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Distribution / packaging
-.Python
-build/
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Temporary files
+temp/
+tmp/
 develop-eggs/
 dist/
 downloads/
